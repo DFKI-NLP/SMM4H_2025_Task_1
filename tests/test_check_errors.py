@@ -1,7 +1,6 @@
 import pytest
 import pandas as pd
-from src.check_errors import load_goldstandard, load_predictions, check_errors
-
+from src.scoring import load_goldstandard, load_predictions, check_errors
 
 def test_load_goldstandard(tmp_path):
     # Create a sample CSV file
