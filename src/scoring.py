@@ -48,6 +48,10 @@ def check_errors(goldstandard, predictions):
     if unknown_labels:
         errors.append(f"Unknown labels found in predictions: {set(unknown_labels)}")
 
+    unknown_keys = [key for key in predictions.keys() if key not in goldstandard.keys()]
+    if unknown_keys:
+        errors.append(f"Unknown keys found in predictions: {set(unknown_keys)}")
+
     if errors:
         print("Errors found in predictions:")
         for error in errors:

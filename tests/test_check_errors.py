@@ -82,3 +82,85 @@ def test_check_errors_MissingPredictions():
     builtins.print = original_print  # Restore original print
 
     assert "Missing predictions for IDs:" in errors[1]  # Expect an error message
+
+def test_check_errors_DuplicatePrediction():
+    gold_df = pd.DataFrame({
+        'id': ['de_0', 'en_0', 'fr_0'],
+        'label': [0, 1, 0]
+    })
+    gold_df = gold_df.set_index('id')
+    predictions = pd.DataFrame({
+        'id': ['de_0', 'en_0', 'fr_0', 'fr_0'],
+        'predicted_label': [0, 1, 0, 1]
+    })
+    predictions = predictions.set_index('id')['predicted_label'].to_dict()
+    errors = []
+
+    def mock_print(msg):  # Capture print statements
+        errors.append(msg)
+
+    # Monkey-patch print to capture output
+    import builtins
+    original_print = builtins.print
+    builtins.print = mock_print
+
+    check_errors(gold_df, predictions)
+
+    builtins.print = original_print  # Restore original print
+
+    assert "Duplicate prediction entries for IDs:" in errors[1]  # Expect an error message
+
+def test_check_errors_UnknownLabels():
+    gold_df = pd.DataFrame({
+        'id': ['de_0', 'en_0', 'fr_0'],
+        'label': [0, 1, 0]
+    })
+    gold_df = gold_df.set_index('id')
+    predictions = pd.DataFrame({
+        'id': ['de_0', 'en_0', 'fr_0'],
+        'predicted_label': [0, 1, 2]
+    })
+    predictions = predictions.set_index('id')['predicted_label'].to_dict()
+    errors = []
+
+    def mock_print(msg):  # Capture print statements
+        errors.append(msg)
+
+    # Monkey-patch print to capture output
+    import builtins
+    original_print = builtins.print
+    builtins.print = mock_print
+
+    check_errors(gold_df, predictions)
+
+    builtins.print = original_print  # Restore original print
+
+    assert "Unknown labels found in predictions:" in errors[1]  # Expect error
+
+
+def test_check_errors_UnknownKeys():
+    gold_df = pd.DataFrame({
+        'id': ['de_0', 'en_0', 'fr_0'],
+        'label': [0, 1, 0]
+    })
+    gold_df = gold_df.set_index('id')
+    predictions = pd.DataFrame({
+        'id': ['de_0', 'en_0', 'fr_0', 'en_1'],
+        'predicted_label': [0, 1, 0, 1]
+    })
+    predictions = predictions.set_index('id')['predicted_label'].to_dict()
+    errors = []
+
+    def mock_print(msg):  # Capture print statements
+        errors.append(msg)
+
+    # Monkey-patch print to capture output
+    import builtins
+    original_print = builtins.print
+    builtins.print = mock_print
+
+    check_errors(gold_df, predictions)
+
+    builtins.print = original_print  # Restore original print
+
+    assert "Unknown keys found in predictions:" in errors[1]  # Expect error
