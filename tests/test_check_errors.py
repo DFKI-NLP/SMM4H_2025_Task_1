@@ -3,6 +3,10 @@ import pandas as pd
 from scoring import load_goldstandard, load_predictions, check_errors
 
 def test_load_goldstandard(tmp_path):
+    """
+    Test that the load_goldstandard function correctly loads data from a CSV file
+    and returns a DataFrame with the expected structure and values.
+    """
     # Create a sample CSV file
     gold_file = tmp_path / "goldstandard.csv"
     gold_file.write_text("id,label\n1,1\n2,0\n3,1\n")
@@ -16,6 +20,10 @@ def test_load_goldstandard(tmp_path):
 
 
 def test_load_predictions(tmp_path):
+    """
+    Test that the load_predictions function correctly loads prediction data from a CSV file
+    and returns a dictionary mapping IDs to predicted labels.
+    """
     # Create a sample CSV file for predictions
     pred_file = tmp_path / "predictions.csv"
     pred_file.write_text("id,predicted_label\n1,1\n2,0\n3,0\n")
@@ -29,6 +37,10 @@ def test_load_predictions(tmp_path):
 
 
 def test_load_predictions_with_duplicates(tmp_path):
+    """
+    Test that the load_predictions function correctly identifies and reports duplicate IDs
+    in the predictions file, while keeping the last occurrence of each duplicate in the result.
+    """
     # Create a sample CSV file with duplicate IDs
     pred_file = tmp_path / "predictions_with_duplicates.csv"
     pred_file.write_text("id,predicted_label\n1,1\n2,0\n3,0\n3,1\n")  # Note duplicate ID 3
@@ -51,7 +63,12 @@ def test_load_predictions_with_duplicates(tmp_path):
     # Check dictionary has the last value for the duplicate key
     assert predictions[3] == 1
 
+
 def test_check_errors():
+    """
+    Test the check_errors function with valid predictions that match the gold standard.
+    Verifies that no error messages are reported when all predictions are valid.
+    """
     gold_df = pd.DataFrame({
         'id': ['de_0', 'en_0', 'fr_0'],
         'label': [0, 1, 0]
@@ -78,7 +95,12 @@ def test_check_errors():
 
     assert "No errors found in predictions." in errors[0]  # Expect no error message
 
+
 def test_check_errors_MissingPredictions():
+    """
+    Test that check_errors correctly identifies and reports when predictions
+    are missing for some IDs that are present in the gold standard.
+    """
     #Test for missing predictions; i.e., when the number of predictions is less than the number of goldstandard labels
     gold_df = pd.DataFrame({
         'id': ['de_0', 'en_0', 'fr_0'],
@@ -108,6 +130,10 @@ def test_check_errors_MissingPredictions():
 
 
 def test_check_errors_UnknownLabels():
+    """
+    Test that check_errors correctly identifies and reports when predictions
+    contain label values that are not valid according to the gold standard.
+    """
     gold_df = pd.DataFrame({
         'id': ['de_0', 'en_0', 'fr_0'],
         'label': [0, 1, 0]
@@ -136,6 +162,10 @@ def test_check_errors_UnknownLabels():
 
 
 def test_check_errors_UnknownKeys():
+    """
+    Test that check_errors correctly identifies and reports when predictions
+    contain IDs that do not exist in the gold standard dataset.
+    """
     gold_df = pd.DataFrame({
         'id': ['de_0', 'en_0', 'fr_0'],
         'label': [0, 1, 0]
