@@ -28,6 +28,29 @@ def test_load_predictions(tmp_path):
     assert predictions[3] == 0
 
 
+def test_load_predictions_with_duplicates(tmp_path):
+    # Create a sample CSV file with duplicate IDs
+    pred_file = tmp_path / "predictions_with_duplicates.csv"
+    pred_file.write_text("id,predicted_label\n1,1\n2,0\n3,0\n3,1\n")  # Note duplicate ID 3
+
+    # Capture stdout
+    import io
+    import sys
+    captured_output = io.StringIO()
+    sys.stdout = captured_output
+
+    # Call function while stdout is being captured
+    predictions = load_predictions(str(pred_file))
+
+    # Restore stdout
+    sys.stdout = sys.__stdout__
+
+    # Check that the duplicate was detected
+    assert "Duplicate prediction entries for IDs: 3" in captured_output.getvalue()
+
+    # Check dictionary has the last value for the duplicate key
+    assert predictions[3] == 1
+
 def test_check_errors():
     gold_df = pd.DataFrame({
         'id': ['de_0', 'en_0', 'fr_0'],
@@ -83,32 +106,6 @@ def test_check_errors_MissingPredictions():
 
     assert "Missing predictions for IDs:" in errors[1]  # Expect an error message
 
-def test_check_errors_DuplicatePrediction():
-    gold_df = pd.DataFrame({
-        'id': ['de_0', 'en_0', 'fr_0'],
-        'label': [0, 1, 0]
-    })
-    gold_df = gold_df.set_index('id')
-    predictions = pd.DataFrame({
-        'id': ['de_0', 'en_0', 'fr_0', 'fr_0'],
-        'predicted_label': [0, 1, 0, 1]
-    })
-    predictions = predictions.set_index('id')['predicted_label'].to_dict()
-    errors = []
-
-    def mock_print(msg):  # Capture print statements
-        errors.append(msg)
-
-    # Monkey-patch print to capture output
-    import builtins
-    original_print = builtins.print
-    builtins.print = mock_print
-
-    check_errors(gold_df, predictions)
-
-    builtins.print = original_print  # Restore original print
-
-    assert "Duplicate prediction entries for IDs:" in errors[1]  # Expect an error message
 
 def test_check_errors_UnknownLabels():
     gold_df = pd.DataFrame({

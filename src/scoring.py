@@ -29,8 +29,13 @@ def load_predictions(file_path):
             sys.exit(1)
 
     df = pd.read_csv(file_path, header=0)
-    return df.set_index('id')['predicted_label'].to_dict()
 
+    # Check for duplicates in the 'id' column before setting it as the index
+    duplicate_ids = df['id'][df['id'].duplicated()].unique()
+    if len(duplicate_ids) > 0:
+        print(f"Duplicate prediction entries for IDs: {', '.join(map(str, duplicate_ids))}")
+
+    return df.set_index('id')['predicted_label'].to_dict()
 
 def check_errors(goldstandard, predictions):
     """Check for missing predictions, duplicate entries, and unknown labels in the predictions."""
