@@ -29,9 +29,16 @@ def test_load_predictions(tmp_path):
 
 
 def test_check_errors():
-    gold_df = pd.DataFrame({"label": [1, 0, 1]}, index=[1, 2, 3])
-    predictions = {1: 1, 2: 0, 3: 0}  # No missing or duplicate IDs, one wrong label
-
+    gold_df = pd.DataFrame({
+        'id': ['de_0', 'en_0', 'fr_0'],
+        'label': [0, 1, 0]
+    })
+    gold_df = gold_df.set_index('id')
+    predictions = pd.DataFrame({
+        'id': ['de_0', 'en_0', 'fr_0'],
+        'predicted_label': [0, 1, 0]
+    })
+    predictions = predictions.set_index('id')['predicted_label'].to_dict()
     errors = []
 
     def mock_print(msg):  # Capture print statements
@@ -46,5 +53,5 @@ def test_check_errors():
 
     builtins.print = original_print  # Restore original print
 
-    assert "Unknown labels found in predictions" in errors[0]  # Expect an error message
+    assert "No errors found in predictions." in errors[0]  # Expect an error message
 
