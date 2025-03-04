@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from scoring import load_goldstandard, load_predictions, check_errors
+from scoring import load_goldstandard, load_predictions, check_errors, evaluate
 
 def test_load_goldstandard(tmp_path):
     """
@@ -27,6 +27,22 @@ def test_load_predictions(tmp_path):
     # Create a sample CSV file for predictions
     pred_file = tmp_path / "predictions.csv"
     pred_file.write_text("id,predicted_label\n1,1\n2,0\n3,0\n")
+
+    predictions = load_predictions(str(pred_file))
+
+    assert isinstance(predictions, dict)
+    assert predictions[1] == 1
+    assert predictions[2] == 0
+    assert predictions[3] == 0
+
+def test_load_predictionsInvarianceTest(tmp_path):
+    """
+    Test that the load_predictions function correctly loads prediction data from a CSV file
+    and returns a dictionary mapping IDs to predicted labels.
+    """
+    # Create a sample CSV file for predictions
+    pred_file = tmp_path / "predictions.csv"
+    pred_file.write_text("predicted_label,id\n1,1\n0,2\n0,3\n")
 
     predictions = load_predictions(str(pred_file))
 
@@ -191,3 +207,71 @@ def test_check_errors_UnknownKeys():
     builtins.print = original_print  # Restore original print
 
     assert "Unknown keys found in predictions:" in errors[1]  # Expect error
+
+
+def test_f1_score_en(monkeypatch):
+    gold_df =pd.DataFrame({
+        'id': [1, 2, 3, 4, 5],
+        'label': [0, 1, 1, 0, 1],
+        'language': ['en', 'en', 'en', 'en', 'en']
+    }).set_index('id')
+    predictions = {
+        1: 0,
+        2: 1,
+        3: 0,
+        4: 0,
+        5: 1}
+
+    class ResultCapture:
+        output = ""
+
+    def mock_print(*args, **kwargs):
+        ResultCapture.output += " ".join(str(arg) for arg in args) + "\n"
+
+    monkeypatch.setattr("builtins.print", mock_print)
+
+    evaluate(gold_df, predictions)
+    precision = 2/2
+    recall = 2/3
+    f1 = 2 * (precision * recall) / (precision + recall)
+
+    assert f'F1-en: {f1:.4f}' in ResultCapture.output
+
+
+def test_f1_score_en_fr(monkeypatch):
+    gold_df =pd.DataFrame({
+        'id': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        'label': [0, 1, 1, 0, 1, 0, 1, 1, 1, 1],
+        'language': ['en', 'en', 'en', 'en', 'en', 'fr', 'fr', 'fr', 'fr', 'fr']
+    }).set_index('id')
+    predictions = {
+        1: 0, #0
+        2: 1, #1
+        3: 0, #1
+        4: 0, #0
+        5: 1, #1
+
+        6: 0, #0
+        7: 1, #1
+        8: 1, #1
+        9: 0, #1
+        10: 1 #1
+    }
+
+    class ResultCapture:
+        output = ""
+
+    def mock_print(*args, **kwargs):
+        ResultCapture.output += " ".join(str(arg) for arg in args) + "\n"
+
+    monkeypatch.setattr("builtins.print", mock_print)
+
+    evaluate(gold_df, predictions)
+
+    assert f'Precision-en: {2/2:.4f}' in ResultCapture.output
+    assert f'Recall-en: {2/3:.4f}' in ResultCapture.output
+    assert f'F1-en: {2 * (2/2 * 2/3) / (2/2 + 2/3):.4f}' in ResultCapture.output
+
+    assert f'Precision-fr: {3/3:.4f}' in ResultCapture.output
+    assert f'Recall-fr: {3/4:.4f}' in ResultCapture.output
+    assert f'F1-fr: {2 * (3/3 * 3/4) / (3/3 + 3/4):.4f}' in ResultCapture.output
