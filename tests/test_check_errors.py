@@ -275,3 +275,7 @@ def test_f1_score_en_fr(monkeypatch):
     assert f'Precision-fr: {3/3:.4f}' in ResultCapture.output
     assert f'Recall-fr: {3/4:.4f}' in ResultCapture.output
     assert f'F1-fr: {2 * (3/3 * 3/4) / (3/3 + 3/4):.4f}' in ResultCapture.output
+
+    assert f'Precision: {5/5:.4f}' in ResultCapture.output
+    assert f'Recall: {5/7:.4f}' in ResultCapture.output
+    assert f'F1: {2 * (5/5 * 5/7) / (5/5 + 5/7):.4f}' in ResultCapture.output
