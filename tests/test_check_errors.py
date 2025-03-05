@@ -239,6 +239,65 @@ def test_f1_score_en(monkeypatch):
     assert f'Recall-en: {recall:.4f}' in ResultCapture.output
     assert f'F1-en: {f1:.4f}' in ResultCapture.output
 
+def test_f1_score_en_FP_only(monkeypatch):
+    gold_df =pd.DataFrame({
+        'id': [1, 2, 3, 4, 5],
+        'label': [0, 1, 1, 0, 1],
+        'language': ['en', 'en', 'en', 'en', 'en']
+    }).set_index('id')
+    predictions = {
+        1: 1, #0 FP
+        2: 1, #1 TP
+        3: 1, #1 TP
+        4: 1, #0 FP
+        5: 1} #1 TP
+
+    class ResultCapture:
+        output = ""
+
+    def mock_print(*args, **kwargs):
+        ResultCapture.output += " ".join(str(arg) for arg in args) + "\n"
+
+    monkeypatch.setattr("builtins.print", mock_print)
+
+    evaluate(gold_df, predictions)
+    precision = 3/5
+    recall = 3/3
+    f1 = 2 * (precision * recall) / (precision + recall)
+
+    assert f'Precision-en: {precision:.4f}' in ResultCapture.output
+    assert f'Recall-en: {recall:.4f}' in ResultCapture.output
+    assert f'F1-en: {f1:.4f}' in ResultCapture.output
+
+def test_f1_score_en_FN_only(monkeypatch):
+    gold_df =pd.DataFrame({
+        'id': [1, 2, 3, 4, 5],
+        'label': [0, 1, 1, 0, 1],
+        'language': ['en', 'en', 'en', 'en', 'en']
+    }).set_index('id')
+    predictions = {
+        1: 0, #0 TN
+        2: 0, #1 FN
+        3: 0, #1 FN
+        4: 0, #0 TN
+        5: 0} #1 FN
+
+    class ResultCapture:
+        output = ""
+
+    def mock_print(*args, **kwargs):
+        ResultCapture.output += " ".join(str(arg) for arg in args) + "\n"
+
+    monkeypatch.setattr("builtins.print", mock_print)
+
+    evaluate(gold_df, predictions)
+    precision = 0
+    recall = 0
+    f1 = 0
+
+    assert f'Precision-en: {precision:.4f}' in ResultCapture.output
+    assert f'Recall-en: {recall:.4f}' in ResultCapture.output
+    assert f'F1-en: {f1:.4f}' in ResultCapture.output
 
 def test_f1_score_en_fr(monkeypatch):
     gold_df =pd.DataFrame({
