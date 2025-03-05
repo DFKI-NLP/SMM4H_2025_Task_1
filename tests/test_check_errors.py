@@ -216,11 +216,11 @@ def test_f1_score_en(monkeypatch):
         'language': ['en', 'en', 'en', 'en', 'en']
     }).set_index('id')
     predictions = {
-        1: 0,
-        2: 1,
-        3: 0,
-        4: 0,
-        5: 1}
+        1: 0, #0 TN
+        2: 1, #1 TP
+        3: 0, #1 FN
+        4: 0, #0 TN
+        5: 1} #1 TP
 
     class ResultCapture:
         output = ""
@@ -235,6 +235,8 @@ def test_f1_score_en(monkeypatch):
     recall = 2/3
     f1 = 2 * (precision * recall) / (precision + recall)
 
+    assert f'Precision-en: {precision:.4f}' in ResultCapture.output
+    assert f'Recall-en: {recall:.4f}' in ResultCapture.output
     assert f'F1-en: {f1:.4f}' in ResultCapture.output
 
 
