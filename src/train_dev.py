@@ -105,9 +105,9 @@ def compute_metrics(eval_pred, seed=None):
 
 # Hyperparameter search space
 param_search = {
-    'learning_rate': [1e-5, 3e-5, 5e-5],
+    'learning_rate': [1e-5, 3e-5],
     'batch_size': [16],
-    'num_epochs': [3, 5, 7],
+    'num_epochs': [3, 5],
     'weight_decay': [0.0, 0.01]
 }
 
@@ -115,6 +115,8 @@ best_f1 = 0
 best_params = None
 
 for lr, bs, epochs, wd in itertools.product(param_search['learning_rate'], param_search['batch_size'], param_search['num_epochs'], param_search['weight_decay']):
+    print(f"Trying hyperparameters: learning_rate={lr}, batch_size={bs}, num_epochs={epochs}, weight_decay={wd}")
+    
     training_args = TrainingArguments(
         output_dir="./results",
         evaluation_strategy="epoch",
