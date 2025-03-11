@@ -13,7 +13,7 @@ import itertools
 os.environ["WANDB_DISABLED"] = "true"
 
 # Set the Hugging Face token as an environment variable
-os.environ["HUGGINGFACE_TOKEN"] = "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"
+os.environ["HUGGINGFACE_TOKEN"] = "YOUR_HF_TOKEN_HERE"
 
 # Load data
 train_df = pd.read_csv("train_data_SMM4H_2025_Task_1.csv")[["id", "text", "label"]]
