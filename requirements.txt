@@ -1,3 +1,10 @@
 pandas==2.2.3
 scikit-learn==1.6.1
 pytest==8.3.4
+matplotlib==3.10.1
+seaborn==0.13.2
+tqdm==4.67.1
+torch==2.6.0
+transformers==4.49.0
+ipykernel==6.29.5
+notebook==7.0.7
