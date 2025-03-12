@@ -1,4 +1,4 @@
-# SMM4H 2025 Task 1: 
+# SMM4H 2025 Task 1
 
 **Binary Classification of Social Media Posts containing Adverse Drug Events in German, French, Russian and English**
 
