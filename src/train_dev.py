@@ -60,9 +60,6 @@ if not os.path.exists(output_file):
 def compute_metrics(eval_pred, seed=None):
     logits, labels = eval_pred
 
-    # Print shapes to debug
-    print(f"DEBUG: Logits shape: {logits.shape}, Labels shape: {labels.shape}")
-
     # Handle binary classification (logits might be shape [batch_size, 1] or [batch_size, 2])
     if logits.shape[-1] == 1:  # Sigmoid activation case
         predictions = (torch.sigmoid(torch.tensor(logits)) > 0.5).numpy().astype(int).flatten()
@@ -75,10 +72,6 @@ def compute_metrics(eval_pred, seed=None):
         min_length = min(len(labels), len(predictions))
         labels = labels[:min_length]
         predictions = predictions[:min_length]
-
-    # Print some example values
-    print(f"DEBUG: Sample Labels: {labels[:5]}")
-    print(f"DEBUG: Sample Predictions: {predictions[:5]}")
 
     # Compute metrics
     acc = accuracy_score(labels, predictions)
