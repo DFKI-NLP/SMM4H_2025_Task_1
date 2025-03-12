@@ -1,11 +1,12 @@
 # SMM4H 2025 Task 1: 
 
-## Binary Classification of Social Media Posts containing Adverse Drug Events in German, French, Russian and English
+**Binary Classification of Social Media Posts containing Adverse Drug Events in German, French, Russian and English**
 
 This repository contains the  evaluation script and starter-code for the SMM4H 2025 Task 1 challenge.
 
 Website: https://healthlanguageprocessing.org/smm4h-2025/
 
+### Overview 
 
 Adverse Drug Events (ADEs) are negative medical side effects associated with a drug. Extracting ADE mentions from user-generated text has gained significant attention in research, as it can help detect crowd signals from online discussions. Leveraging multilingual methods to analyze ADE reports across languages and borders further enhances this effort.
 
